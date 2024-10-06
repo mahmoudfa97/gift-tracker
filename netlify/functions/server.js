@@ -8,24 +8,26 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-let gifts = []; // In-memory storage for gifts
+let gifts = []; 
+const corsOptions = {
+    origin: 'https://gifttracker.netlify.app', // Your Netlify domain
+    optionsSuccessStatus: 200
+  };
+  
+  app.use(cors(corsOptions));
 
-app.use(cors());
 app.use(bodyParser.json());
 
-// Proxy for Next.js application
 app.use('/next', createProxyMiddleware({
-    target: 'http://localhost:3000', // Your Next.js app
+    target: 'https://gifttracker.netlify.app', // Your Next.js app
     changeOrigin: true,
     pathRewrite: { '^/next': '' }, // Remove `/next` from the path
 }));
 
-// Get all gifts
 app.get('/api/gifts', (req, res) => {
     res.json(gifts);
 });
 
-// Add or update a gift
 app.post('/api/gifts', (req, res) => {
     const { recipient, visits, price } = req.body;
 
