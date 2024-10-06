@@ -1,52 +1,55 @@
-// netlify/functions/gifts.js
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const serverless = require('serverless-http');
+const gifts = [];
 
-const app = express();
-let gifts = [];
+exports.handler = async (event, context) => {
+  if (event.httpMethod === 'GET') {
+    // Handle GET request to fetch all gifts
+    return {
+      statusCode: 200,
+      body: JSON.stringify(gifts),
+    };
+  }
 
-const corsOptions = {
-    origin: 'https://gifttracker.netlify.app', // Your Netlify domain
-    optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
-app.use(bodyParser.json());
-
-// Get all gifts
-app.get('/api/gifts', (req, res) => {
-    res.json(gifts);
-});
-
-// Add or update a gift
-app.post('/api/gifts', (req, res) => {
-    const { recipient, visits, price } = req.body;
+  if (event.httpMethod === 'POST') {
+    // Parse the request body
+    const { recipient, visits, price } = JSON.parse(event.body);
 
     if (!recipient || !visits || !price) {
-        return res.status(400).json({ error: 'All fields are required' });
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'All fields are required' }),
+      };
     }
 
     const existingGiftIndex = gifts.findIndex(gift => gift.recipient.toLowerCase() === recipient.toLowerCase());
 
     if (existingGiftIndex !== -1) {
-        // Update existing gift
-        gifts[existingGiftIndex].visits = (parseInt(gifts[existingGiftIndex].visits) + parseInt(visits)).toString();
-        gifts[existingGiftIndex].price = (parseFloat(gifts[existingGiftIndex].price) + parseFloat(price)).toFixed(2);
+      // Update existing gift
+      gifts[existingGiftIndex].visits = (parseInt(gifts[existingGiftIndex].visits) + parseInt(visits)).toString();
+      gifts[existingGiftIndex].price = (parseFloat(gifts[existingGiftIndex].price) + parseFloat(price)).toFixed(2);
     } else {
-        // Add new gift
-        const newGift = { id: Date.now(), recipient, visits, price };
-        gifts.push(newGift);
+      // Add new gift
+      const newGift = { id: Date.now(), recipient, visits, price };
+      gifts.push(newGift);
     }
 
-    res.json(gifts);
-});
+    return {
+      statusCode: 200,
+      body: JSON.stringify(gifts),
+    };
+  }
 
-// Delete a gift
-app.delete('/api/gifts/:id', (req, res) => {
-    gifts = gifts.filter(gift => gift.id !== Number(req.params.id));
-    res.sendStatus(204);
-});
+  if (event.httpMethod === 'DELETE') {
+    const { id } = event.queryStringParameters;
+    gifts = gifts.filter(gift => gift.id !== Number(id));
 
-module.exports.handler = serverless(app);
+    return {
+      statusCode: 204,
+      body: '',
+    };
+  }
+
+  return {
+    statusCode: 405,
+    body: JSON.stringify({ error: 'Method not allowed' }),
+  };
+};

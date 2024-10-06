@@ -14,7 +14,7 @@ interface IGift {
 export default function GiftTracker() {
   const [gifts, setGifts] = useState<IGift[]>([])
   const [newGift, setNewGift] = useState<IGift>({id:0, recipient: '', visits: '', price: '' })
-  const apiBaseUrl = '/.netlify/functions/gifts';
+  const apiBaseUrl = '/api/gifts';
   useEffect(() => {
     const fetchGifts = async () => {
       try {
