@@ -1,33 +1,26 @@
-// server.js
+// netlify/functions/gifts.js
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-require('dotenv').config();
+const serverless = require('serverless-http');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+let gifts = [];
 
-let gifts = []; 
 const corsOptions = {
     origin: 'https://gifttracker.netlify.app', // Your Netlify domain
-    optionsSuccessStatus: 200
-  };
-  
-  app.use(cors(corsOptions));
+    optionsSuccessStatus: 200,
+};
 
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-app.use('/next', createProxyMiddleware({
-    target: 'https://gifttracker.netlify.app', // Your Next.js app
-    changeOrigin: true,
-    pathRewrite: { '^/next': '' }, // Remove `/next` from the path
-}));
-
+// Get all gifts
 app.get('/api/gifts', (req, res) => {
     res.json(gifts);
 });
 
+// Add or update a gift
 app.post('/api/gifts', (req, res) => {
     const { recipient, visits, price } = req.body;
 
@@ -50,12 +43,10 @@ app.post('/api/gifts', (req, res) => {
     res.json(gifts);
 });
 
-// Remove a gift
+// Delete a gift
 app.delete('/api/gifts/:id', (req, res) => {
     gifts = gifts.filter(gift => gift.id !== Number(req.params.id));
     res.sendStatus(204);
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+module.exports.handler = serverless(app);
