@@ -1,20 +1,29 @@
 {
   "name": "gift-tracker",
   "version": "0.1.0",
+  "proxy": "http://localhost:3001",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-      "deploy": "npm run build && gh-pages -d out",
+    "deploy": "npm run build && gh-pages -d out",
     "export": "next export"
   },
   "dependencies": {
+    "@next/env": "^14.2.14",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "axios": "^1.7.7",
+    "body-parser": "^1.20.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "fs": "^0.0.1-security",
+    "http-proxy-middleware": "^3.0.2",
     "next": "14.2.14",
     "react": "^18",
     "react-dom": "^18",
@@ -28,8 +37,22 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.14",
     "gh-pages": "^6.1.1",
+    "netlify-cli": "^17.36.4",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
-  }
+  },
+  "description": "This is a [Next.js](https://nextjs.org) project to track custom gifts./",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mahmoudfa97/gift-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mahmoudfa97/gift-tracker/issues"
+  },
+  "homepage": "https://github.com/mahmoudfa97/gift-tracker#readme"
 }

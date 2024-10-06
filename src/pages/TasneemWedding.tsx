@@ -5,7 +5,8 @@ import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table"
-
+import axios from 'axios'
+ 
 interface IGift {
     id: number,  recipient: string, visits: string, price: string 
 }
@@ -14,38 +15,41 @@ export default function TasneemWedding() {
   const [gifts, setGifts] = useState<IGift[]>([])
   const [newGift, setNewGift] = useState<IGift>({id:0, recipient: '', visits: '', price: '' })
 
-  useEffect(() => {
-    const savedGifts = localStorage.getItem('tasnem')
-    if (savedGifts) setGifts(JSON.parse(savedGifts))
-  }, [])
+  const apiBaseUrl = 'http://localhost:3001/api/gifts'; // Make sure to match this with your backend port
 
   useEffect(() => {
-    localStorage.setItem('tasnem', JSON.stringify(gifts))
-  }, [gifts])
+    const fetchGifts = async () => {
+      try {
+        const response = await axios.get(apiBaseUrl!);
+        setGifts(response.data);
+      } catch (error) {
+        console.error('Failed to fetch gifts:', error);
+      }
+    };
+    fetchGifts();
+  }, []);
 
-  const addOrUpdateGift = () => {
+
+  const addOrUpdateGift = async () => {
     if (newGift.recipient && newGift.visits && newGift.price) {
-      setGifts(prevGifts => {
-        const existingGiftIndex = prevGifts.findIndex(gift => gift.recipient.toLowerCase() === newGift.recipient.toLowerCase())
-
-        if (existingGiftIndex !== -1) {
-          const updatedGifts = [...prevGifts]
-          updatedGifts[existingGiftIndex] = {
-            ...updatedGifts[existingGiftIndex],
-            visits: (parseInt(updatedGifts[existingGiftIndex].visits) + parseInt(newGift.visits)).toString(),
-            price: (parseFloat(updatedGifts[existingGiftIndex].price) + parseFloat(newGift.price)).toFixed(2)
-          }
-          return updatedGifts
-        } else {
-          return [...prevGifts, { ...newGift, id: Date.now() }]
-        }
-      })
-      setNewGift({id:0, recipient: '', visits: '', price: '' })
+      try {
+        const response = await axios.post(apiBaseUrl!, newGift);
+        setGifts(response.data);
+        setNewGift({id:0, recipient: '', visits: '', price: '' }); // Clear input fields
+      } catch (error) {
+        console.error('Failed to add gift:', error);
+      }
     }
-  }
+  };
 
-  const removeGift = (id:number) => setGifts(gifts.filter(gift => gift.id !== id))
-
+  const removeGift = async (id:number) => {
+    try {
+      await axios.delete(`${apiBaseUrl}/${id}`);
+      setGifts(gifts.filter(gift => gift.id !== id));
+    } catch (error) {
+      console.error('Failed to remove gift:', error);
+    }
+  };
   return (
     <div className="w-full max-w-4xl p-6 bg-white rounded-lg shadow-lg">
     <h1 className="text-2xl font-bold mb-6">نقوط عرس تسنيم</h1>
