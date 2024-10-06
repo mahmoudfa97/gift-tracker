@@ -15,7 +15,7 @@ export default function TasneemWedding() {
   const [gifts, setGifts] = useState<IGift[]>([])
   const [newGift, setNewGift] = useState<IGift>({id:0, recipient: '', visits: '', price: '' })
 
-  const apiBaseUrl =  process.env.HOST; // Make sure to match this with your backend port
+  const apiBaseUrl = 'http://localhost:3001/api/gifts'; // Make sure to match this with your backend port
 
   useEffect(() => {
     const fetchGifts = async () => {

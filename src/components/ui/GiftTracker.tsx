@@ -14,12 +14,12 @@ interface IGift {
 export default function GiftTracker() {
   const [gifts, setGifts] = useState<IGift[]>([])
   const [newGift, setNewGift] = useState<IGift>({id:0, recipient: '', visits: '', price: '' })
-  const apiBaseUrl =  process.env.HOST; // Make sure to match this with your backend port
+  const apiBaseUrl = 'http://localhost:3001/api/gifts'; // Make sure to match this with your backend port
 
   useEffect(() => {
     const fetchGifts = async () => {
       try {
-        const response = await axios.get(apiBaseUrl!);
+        const response = await axios.get(apiBaseUrl);
         setGifts(response.data);
       } catch (error) {
         console.error('Failed to fetch gifts:', error);
@@ -32,7 +32,7 @@ export default function GiftTracker() {
   const addOrUpdateGift = async () => {
     if (newGift.recipient && newGift.visits && newGift.price) {
       try {
-        const response = await axios.post(apiBaseUrl!, newGift);
+        const response = await axios.post(apiBaseUrl, newGift);
         setGifts(response.data);
         setNewGift({id:0, recipient: '', visits: '', price: '' }); // Clear input fields
       } catch (error) {
